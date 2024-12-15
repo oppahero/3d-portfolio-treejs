@@ -7,6 +7,7 @@ import { Canvas } from "@react-three/fiber"
 import { Suspense } from "react"
 import Loader from "../components/Loader"
 import Island from "../models/Island"
+import Sky from "../models/Sky"
 
 // Para poder los modelos en la escena hay que añadir luz a esta
 /**
@@ -51,6 +52,7 @@ const Home = () => {
           {/* <spotLight /> */}
           <hemisphereLight skyColor='#b1e1ff' groundColor='#000000' intensity={1} />
 
+          <Sky/>
           <Island
             position={islandPosition}
             scale={islandScale}
