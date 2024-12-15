@@ -7,7 +7,7 @@ Source: https://sketchfab.com/3d-models/foxs-islands-163b68e09fcc47618450150be77
 Title: Fox's islands
 */
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useGLTF } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { a } from "@react-spring/three";
@@ -16,9 +16,125 @@ import islandScene from "../assets/3d/island.glb";
 
 // Se usará @react-spring/three para las animaciones (a)
 
-const Island = (props) => {
+const Island = ({ isRotating, setIsRotating, ...props }) => {
   const islandRef = useRef();
+
+  const { gl, viewport } = useThree();
   const { nodes, materials } = useGLTF(islandScene);
+
+  const lastX = useRef(0);
+  const rotationSpeed = useRef(0);
+  const dampingFactor = 0.95;
+
+  const handlePointerDown = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setIsRotating(true);
+
+    // saber si es un evento tactil o un mouse
+
+    const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+
+    lastX.current = clientX;
+  };
+
+  const handlePointerUp = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setIsRotating(false);
+  };
+
+  const handlePointerMove = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (isRotating) {
+      const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+
+      // Calcular cambio en posicion horizontal
+      const delta = (clientX - lastX.current) / viewport.width;
+
+      // Actualizar la rotaciond de la isla segun el mouse
+      // delta (diferencia) * factor especifico * PI (porque estamos trabajando con un circulo)
+      islandRef.current.rotation.y += delta * 0.01 * Math.PI;
+
+      lastX.current = clientX;
+
+      rotationSpeed.current = delta * 0.01 * Math.PI;
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "ArrowLeft") {
+      if (!isRotating) setIsRotating(true);
+      islandRef.current.rotation.y += 0.01 * Math.PI;
+    } else if (e.key === "ArrowRight") {
+      if (!isRotating) setIsRotating(true);
+      islandRef.current.rotation.y -= 0.01 * Math.PI;
+    }
+  };
+
+  const handleKeyUp = (e) => {
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      setIsRotating(false);
+    }
+  };
+
+  //En cada fotograma
+  useFrame((e) => {
+    if (!isRotating) {
+      // Ir parando el avión lentamente
+      rotationSpeed.current *= dampingFactor;
+
+      if (Math.abs(rotationSpeed.current) < 0.001) {
+        rotationSpeed.current = 0;
+      }
+
+      islandRef.current.rotation.y += rotationSpeed.current;
+
+    } else {
+      const rotation = islandRef.current.rotation.y;
+
+      const normalizedRotation =
+        ((rotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+
+      // Set the current stage based on the island's orientation
+      switch (true) {
+        case normalizedRotation >= 5.45 && normalizedRotation <= 5.85:
+        //   setCurrentStage(4);
+          break;
+        case normalizedRotation >= 0.85 && normalizedRotation <= 1.3:
+        //   setCurrentStage(3);
+          break;
+        case normalizedRotation >= 2.4 && normalizedRotation <= 2.6:
+        //   setCurrentStage(2);
+          break;
+        case normalizedRotation >= 4.25 && normalizedRotation <= 4.75:
+        //   setCurrentStage(1);
+          break;
+        default:
+        //   setCurrentStage(null);
+      }
+    }
+  });
+
+  useEffect(() => {
+    const canvas = gl.domElement;
+    // Los eventos deben estar sujetos al canvas no al dom como tal
+    canvas.addEventListener("pointerdown", handlePointerDown);
+    canvas.addEventListener("pointerup", handlePointerUp);
+    canvas.addEventListener("pointermove", handlePointerMove);
+    document.addEventListener("keyup", handleKeyUp);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      canvas.removeEventListener("pointerdown", handlePointerDown);
+      canvas.removeEventListener("pointerup", handlePointerUp);
+      canvas.removeEventListener("pointermove", handlePointerMove);
+      document.removeEventListener("keyup", handleKeyUp);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [gl, handlePointerDown, handlePointerUp, handlePointerMove]);
 
   return (
     <a.group ref={islandRef} {...props}>
