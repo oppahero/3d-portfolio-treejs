@@ -6,3 +6,14 @@ Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+Libraries
+
+- [@react-three/fiber]()
+- [@react-three/drei]()
+- [@react-spring/three]()
+
+Useful Resources
+
+- [SketchFab](https://sketchfab.com/3d-models?date=week&features=downloadable&sort_by=-likeCount&cursor=bz0yJnA9MjM%3D)
+- [GLTF to JSX components](https://gltf.pmnd.rs/)
