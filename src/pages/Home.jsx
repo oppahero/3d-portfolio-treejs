@@ -1,12 +1,3 @@
-{
-  /* AVE */
-}
-{
-  /* <div className='absolute top-28 left-0  right-0 z-10 flex items-center justify-center'>
-  pop
-</div> */
-}
-
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useState } from "react";
 import Loader from "../components/Loader";
@@ -14,6 +5,7 @@ import Island from "../models/Island";
 import Sky from "../models/Sky";
 import Bird from "../models/Bird";
 import Plane from "../models/Plane";
+import HomeInfo from "../components/HomeInfo";
 
 // Para poder los modelos en la escena hay que añadir luz a esta
 /**
@@ -65,6 +57,10 @@ const Home = () => {
 
   return (
     <section className="w-full h-screen relative">
+      <div className="absolute top-28 left-0  right-0 z-10 flex items-center justify-center">
+        { currentStage && <HomeInfo currentStage={currentStage}/>}
+      </div>
+
       <Canvas
         className={`w-full h-screen bg-transparent ${
           isRotating ? "cursor-grabbing" : "cursor-grab"
@@ -83,7 +79,7 @@ const Home = () => {
           />
 
           <Bird />
-          <Sky isRotating={isRotating}/>
+          <Sky isRotating={isRotating} />
           <Island
             position={islandPosition}
             scale={islandScale}
